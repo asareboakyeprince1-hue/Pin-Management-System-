@@ -20,30 +20,18 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "user_name", unique = true)
-    private String username;
+    @Builder.Default
+    @Column(name = "is_reset")
+    private boolean isReset = false;
 
     @Builder.Default
-    @Column(name = "is_active")
-    private boolean active = true;
+    @Column(name = "is_updated")
+    private boolean isUpdated = false;
 
-    @Column(name = "pin")
+    @Column(name = "pin", length = 64)
     private String pin;
 
     @Column(name = "msisdn")
     private String msisdn;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @ElementCollection
-    @CollectionTable(name = "user_approval_ids", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "approval_id")
-    private Set<Long> approvalIds;
 }
 

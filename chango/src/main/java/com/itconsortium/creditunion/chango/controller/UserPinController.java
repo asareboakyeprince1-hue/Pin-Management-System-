@@ -15,10 +15,10 @@ public class UserPinController {
     @Autowired
     private UserPinService userPinService;
 
-//    @PostMapping("/create")
-//    public PinResponseDto create(@RequestBody CreatePinRequestDto request) {
-//        return userPinService.createPin(request.getMsisdn(), request.getPin());
-//    }
+    @PostMapping("/create")
+    public PinResponseDto create(@RequestBody CreatePinRequestDto request) {
+        return userPinService.createPin(request.getMsisdn(), request.getPin());
+    }
 
     @PostMapping("/update")
     public PinResponseDto update(@RequestBody UpdatePinRequestDto request) {
