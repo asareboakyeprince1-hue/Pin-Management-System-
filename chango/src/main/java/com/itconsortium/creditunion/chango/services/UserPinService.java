@@ -25,35 +25,34 @@ public class UserPinService {
     @Autowired
     private UserRepository userRepository;
 
-//    // Create Pin
-//    public PinResponseDto createPin(String msisdn, String pin) {
-//        User user = userRepository.findByMsisdn(msisdn)
-//                .orElseThrow(() -> new UserNotFoundException("User not found"));
-//
-//        if (user.getPin() != null) {
-//            throw new PinException("Invalid pin");
-//        }
-//
-//        user.setPin(hashPin(pin));
-//        userRepository.save(user);
-//
-//        return new PinResponseDto("Pin has been created");
-//    }
+    // Create Pin
+    public PinResponseDto createPin(String msisdn, String pin) {
+        User user = new User();
+        user.setMsisdn(msisdn);
+
+        if (user.getPin() != null) {
+            throw new PinException("Invalid pin");
+        }
+        user.setPin(hashPin(pin));
+        userRepository.save(user);
+
+        return new PinResponseDto("Pin has been created");
+    }
 
 
     //Change Pin
     public PinResponseDto changePin(String msisdn, String oldPin, String newPin) {
-
         User user = userRepository.findByMsisdn(msisdn)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-//        boolean isValid = isPinEqual(oldPin, user.getPin());
+        boolean isValid = isPinEqual(oldPin, user.getPin());
 
-        if (!oldPin.equals(user.getPin())) {
+        if (!isValid) {
             throw new PinException("New pin does not match old pin");
         }
 
-        user.setPin(newPin);
+        user.setPin(hashPin(newPin));
+        user.setUpdated(true);
         userRepository.save(user);
 
         return new PinResponseDto("Pin has been updated");
@@ -66,11 +65,10 @@ public class UserPinService {
 
         String tempPin = generateTempPin();
 
-        user.setPin(tempPin);
+        user.setPin(hashPin(tempPin));
         userRepository.save(user);
 
         sendSms(msisdn, tempPin);
-
         return new PinResponseDto("Pin has been reset");
     }
 
@@ -81,9 +79,9 @@ public class UserPinService {
         return String.valueOf(pin);
     }
 
-    private boolean isPinEqual(String newPin, String hexOldPin){
-        String decodedHex = new String(HexFormat.of().parseHex(hexOldPin));
-        return newPin.equals(decodedHex);
+    private boolean isPinEqual(String enteredPin, String storedHash){
+        enteredPin = hashPin(enteredPin);
+        return storedHash.equals(enteredPin);
     }
 
     private String hashPin(String pin){
